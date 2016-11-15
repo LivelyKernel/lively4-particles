@@ -1,3 +1,39 @@
+<<<<<<< HEAD
 <lively-turtle-canvas>
   
 </lively-turtle-canvas>
+=======
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Particles</title>
+    <link rel="stylesheet" href="css/index.css" media="screen">
+  </head>
+  <body>
+    <div id="blocklyDiv">
+    </div>
+
+    <lively-turtle-canvas></lively-turtle-canvas>
+
+    <xml id="toolbox" style="display: none">
+      <block type="controls_if"></block>
+      <block type="controls_repeat_ext"></block>
+      <block type="logic_compare"></block>
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="text"></block>
+      <block type="text_print"></block>
+    </xml>
+
+    <script src="google-blockly/blockly_compressed.js"></script>
+    <script src="google-blockly/blocks_compressed.js"></script>
+    <script src="google-blockly/msg/js/en.js"></script>
+
+    <script>
+      var workspace = Blockly.inject('blocklyDiv',
+          {toolbox: document.getElementById('toolbox')});
+    </script>
+  </body>
+</html>
+>>>>>>> 58004d72972d05ba85e67887859da0f4dc632854
