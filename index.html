@@ -4,15 +4,18 @@
     <meta charset="utf-8">
     <title>Particles</title>
     <link rel="stylesheet" href="../lively4-particles/css/index.css" media="screen">
-    <script src="../lively4-particles/google-blockly/blockly_compressed.js"></script>
+    <script src="../lively4-particles/google-blockly/blockly_uncompressed.js"></script>
     <script src="../lively4-particles/google-blockly/msg/js/en.js"></script>
   </head>
   <body>
-    <div id="blocklyDiv">
+    <div style="width: 600px; height: 500px" id="blocklyDiv">
     </div>
 
-    <lively-turtle-canvas></lively-turtle-canvas>
 
+    <!---
+    <lively-turtle-canvas></lively-turtle-canvas>
+    --->
+    
     <xml id="toolbox" style="display: none">
       <block type="controls_if"></block>
       <block type="controls_repeat_ext"></block>
@@ -23,8 +26,12 @@
       <block type="text_print"></block>
     </xml>
     <script>
+      if (window.Blockly) {
       var workspace = Blockly.inject('blocklyDiv',
           {toolbox: document.getElementById('toolbox')});
+      } else {
+        throw new Error("Blockly not defined...")
+      }
     </script>
   </body>
 </html>
