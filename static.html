@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Particles</title>
+    <link rel="import" href="https://lively-kernel.org/lively4/lively4-particles/turtle-canvas.html">
+    <link rel="stylesheet" href="../lively4-particles/css/index.css" media="screen">
+    <script src="../lively4-particles/google-blockly/blockly_compressed.js"></script>
+    <script src="../lively4-particles/google-blockly/msg/js/en.js"></script>
+  </head>
+  <body>
+    <div id="blocklyDiv">
+    </div>
+
+    <!-- this does not work yet...
+    <lively-turtle-canvas></lively-turtle-canvas>
+    -->
+    
+    <xml id="toolbox" style="display: none">
+      <block type="controls_if"></block>
+      <block type="controls_repeat_ext"></block>
+      <block type="logic_compare"></block>
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="text"></block>
+      <block type="text_print"></block>
+    </xml>
+    <script>
+      var workspace = Blockly.inject('blocklyDiv',
+          {toolbox: document.getElementById('toolbox')});
+    </script>
+  </body>
+</html>

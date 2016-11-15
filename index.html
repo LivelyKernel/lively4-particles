@@ -3,35 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>Particles</title>
-    <link rel="stylesheet" href="../lively4-particles/css/index.css" media="screen">
-    <script src="../lively4-particles/google-blockly/blockly_uncompressed.js"></script>
-    <script src="../lively4-particles/google-blockly/msg/js/en.js"></script>
   </head>
   <body>
     <div style="width: 600px; height: 500px" id="blocklyDiv">
     </div>
-
-
-    <!---
-    <lively-turtle-canvas></lively-turtle-canvas>
-    --->
     
-    <xml id="toolbox" style="display: none">
-      <block type="controls_if"></block>
-      <block type="controls_repeat_ext"></block>
-      <block type="logic_compare"></block>
-      <block type="math_number"></block>
-      <block type="math_arithmetic"></block>
-      <block type="text"></block>
-      <block type="text_print"></block>
-    </xml>
-    <script>
-      if (window.Blockly) {
-      var workspace = Blockly.inject('blocklyDiv',
-          {toolbox: document.getElementById('toolbox')});
-      } else {
-        throw new Error("Blockly not defined...")
-      }
-    </script>
+    <h1>Blockly showcase...</h1>
+    <ul>
+      <li><a href="./dynamic.html">dynamic (works in lively)</a></li>
+      <li><a href="./static.html">static (works in outside)</a></li>
+    </ul>
+    We will have to make the static version also work out of the box from within lively. (#Jens)
   </body>
 </html>

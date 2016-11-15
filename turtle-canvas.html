@@ -3,6 +3,16 @@
     <content>
     </content>
   </canvas>
+  
+  <script type="lively4script" data-name="initialize">
+  () => {
+    var canvas = $(this.shadowRoot).find("canvas")[0];
+    var context = canvas.getContext("2d");
+    
+    alert(canvas);
+    alert(context);
+  }
+  </script>
 </template>
 <script>
   lively.registerTemplate()
