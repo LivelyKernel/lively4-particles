@@ -5,8 +5,10 @@ Test
   var can = this.document.getElementById("tCanvas");
   can.initialize();
 
-  can.draw();
-  can.turtle.left(90);
+  //can.draw();
+  can.turtle.pos = {x:200, y:200};
+  can.turtle.pen = true;
+  can.turtle.forward(50);
   
-  lively.notify(can.turtle.heading);
+  //lively.notify(can.turtle.heading);
 </script>
