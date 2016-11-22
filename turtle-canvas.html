@@ -4,6 +4,9 @@ Test
 <script type="text/javascript">
   var can = this.document.getElementById("tCanvas");
   can.initialize();
-  //lively.notify();
+
   can.draw();
+  can.turtle.left(90);
+
+  lively.notify(JSON.stringify(can.turtle));
 </script>
