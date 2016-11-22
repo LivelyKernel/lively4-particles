@@ -6,12 +6,18 @@ Test
   can.initialize();
 
   //can.draw();
-  can.turtle.pos = {x:200, y:200};
-  can.turtle.penDown();
-  
-  for (var i = 0; i < 4; i++)
+  can.turtle.pos = {x:100, y:300};
+
+  for (var j = 0; j < 4; j++)
   {
-    can.turtle.forward(50);
+    can.turtle.penDown();
+    for (var i = 0; i < 4; i++)
+    {
+      can.turtle.forward(50);
+      can.turtle.left(90);
+    }
+    can.turtle.penUp();
+    can.turtle.forward(150);
     can.turtle.left(90);
   }
   
