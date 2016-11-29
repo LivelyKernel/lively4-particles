@@ -8,7 +8,14 @@ Test
   can.turtle.pos = {x:100, y:300};
 
   can.turtle.penDown();
-  can.turtle.forward(100);
-  can.turtle.left(90);
-  can.turtle.forward(20);
+  
+  var angle = 15;
+  for (var i = 0; i < 360; i += angle)
+  {
+    var state = can.turtle.getState();
+    can.turtle.forward(50);
+    can.turtle.setState(state);
+    can.turtle.left(angle);
+  }
+  
 </script>
