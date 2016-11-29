@@ -7,21 +7,23 @@
     </td>
   </tr>
   <tr>
-    <textarea id="code-area">
-      turtle.setPos(150,150);
-      
-      var angle = 5;
-      for (var i = 0; i < 360; i += angle)
-      {
-        var state = can.turtle.getState();
-        can.turtle.forward(100);
-        can.turtle.setState(state);
-        can.turtle.left(angle);
-      }
-    </textarea>
-    <button type="button" onclick="execCode()">
-      Do it!
-    </button>
+    <td>
+      <textarea id="code-area">
+        turtle.setPos(150,150);
+        
+        var angle = 5;
+        for (var i = 0; i < 360; i += angle)
+        {
+          var state = can.turtle.getState();
+          can.turtle.forward(100);
+          can.turtle.setState(state);
+          can.turtle.left(angle);
+        }
+      </textarea>
+      <button type="button" onclick="execCode()">
+        Do it!
+      </button>
+    </td>
   </tr>
 </table>
 <script type="text/javascript">
