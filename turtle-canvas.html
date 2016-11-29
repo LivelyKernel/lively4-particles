@@ -20,7 +20,10 @@ for (var i = 0; i < 360; i += angle)
 }
       </textarea>
       <button type="button" onclick="execCode()">
-Do it!
+Draw this
+      </button>
+      <button type="button" onclick="clear()">
+Clear
       </button>
     </td>
   </tr>
@@ -32,5 +35,9 @@ Do it!
   function execCode()
   {
     can.execute(this.document.getElementById("code-area").value);
+  }
+  function clear()
+  {
+    can.clear();
   }
 </script>
