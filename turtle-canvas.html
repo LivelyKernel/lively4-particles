@@ -1,21 +1,29 @@
-<lively-turtle-canvas id="tCanvas">
-Test
-</lively-turtle-canvas>
-<textarea id="code-area">
-turtle.setPos(150,150);
-
-var angle = 5;
-for (var i = 0; i < 360; i += angle)
-{
-  var state = can.turtle.getState();
-  can.turtle.forward(100);
-  can.turtle.setState(state);
-  can.turtle.left(angle);
-}
-</textarea>
-<button type="button" onclick="execCode()">
-Do it!
-</button>
+<table>
+  <tr>
+    <td>
+      <lively-turtle-canvas id="tCanvas">
+        Test
+      </lively-turtle-canvas>
+    </td>
+  </tr>
+  <tr>
+    <textarea id="code-area">
+      turtle.setPos(150,150);
+      
+      var angle = 5;
+      for (var i = 0; i < 360; i += angle)
+      {
+        var state = can.turtle.getState();
+        can.turtle.forward(100);
+        can.turtle.setState(state);
+        can.turtle.left(angle);
+      }
+    </textarea>
+    <button type="button" onclick="execCode()">
+      Do it!
+    </button>
+  </tr>
+</table>
 <script type="text/javascript">
   var can = this.document.getElementById("tCanvas");
   can.initialize();
