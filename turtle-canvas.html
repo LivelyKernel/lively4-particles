@@ -22,7 +22,7 @@ for (var i = 0; i < 360; i += angle)
       <button type="button" onclick="execCode()">
 Draw this
       </button>
-      <button type="button" onclick="clear()">
+      <button type="button" onclick="clearThis()">
 Clear
       </button>
     </td>
@@ -36,7 +36,7 @@ Clear
   {
     can.execute(this.document.getElementById("code-area").value);
   }
-  function clear()
+  function clearThis()
   {
     can.clearCanvas();
   }
