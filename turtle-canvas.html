@@ -13,12 +13,12 @@ turtle.penDown();
 var angle = 5;
 for (var i = 0; i < 360; i += angle)
 {
-  var state = can.turtle.getState();
-  can.turtle.forward(100);
-  can.turtle.setState(state);
-  can.turtle.left(angle);
+  var state = turtle.getState();
+  turtle.forward(100);
+  turtle.setState(state);
+  turtle.left(angle);
 }
-      </textarea>
+</textarea>
       <button type="button" onclick="execCode()">
 Draw this
       </button>
