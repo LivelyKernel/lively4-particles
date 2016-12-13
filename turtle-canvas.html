@@ -7,16 +7,53 @@ Test
     </td>
     <td>
       <textarea id="code-area">
-turtle.setPos(150,150);
-turtle.penDown();
+var parts = [];
 
-var angle = 5;
-for (var i = 0; i < 360; i += angle)
+for (var i = 0; i < 100; i++)
 {
-  var state = turtle.getState();
-  turtle.forward(100);
-  turtle.setState(state);
-  turtle.left(angle);
+  var part = {
+    turtle: {
+      pos: {
+        x: (Math.random() * 400 + 100),
+        y: (Math.random() * 250 + 100)
+      },
+      heading: (Math.random() * 360)
+    },
+    velocity: (Math.random() * 32 + 32)
+  };
+
+  parts[i] = part;
+}
+
+for (var l = 0; l < 50; l++){
+  var newparts = [];
+  for (var i in parts)
+  {
+    var particle = parts[i];
+    var keep = true;
+    turtle.setState(particle.turtle);
+    
+    // User code start
+    turtle.penUp();
+    turtle.setColor(Math.round(particle.velocity * 20),
+                    Math.round(particle.velocity * 4),
+                    0);
+    turtle.forward(particle.velocity);
+    turtle.backward(1);
+    turtle.penDown();
+    turtle.forward(1);
+    
+    if (Math.random() < 0.5) turtle.left(Math.random()*10);
+    else turtle.right(Math.random()*10);
+    particle.velocity *= 0.8;
+    keep = particle.velocity > 1;
+    // User code end
+  
+    particle.turtle = turtle.getState();
+    if (keep)
+      newparts[i] = particle;
+  }
+  parts = newparts;
 }
 </textarea>
       <button type="button" onclick="execCode()">
