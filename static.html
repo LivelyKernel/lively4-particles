@@ -6,28 +6,139 @@
     <link rel="import" href="https://lively-kernel.org/lively4/lively4-particles/turtle-canvas.html">
     <link rel="stylesheet" href="../lively4-particles/css/index.css" media="screen">
     <script src="../lively4-particles/google-blockly/blockly_compressed.js"></script>
+    <script src="../lively4-particles/google-blockly/javascript_compressed.js"></script>
     <script src="../lively4-particles/google-blockly/msg/js/en.js"></script>
   </head>
   <body>
+    <button id="runBtn" class="primary" title="Run animation">
+      Run animation
+    </button>
+    <!-- <button id="resetBtn" class="primary" title="Reset animation">
+      Reset animation
+    </button> -->
     <div id="blocklyDiv">
     </div>
-
+    <div id="visualization" style="left: 400px">
+      <canvas id="display" width="400" height="400"></canvas>
+    </div>
     <!-- this does not work yet...
     <lively-turtle-canvas></lively-turtle-canvas>
     -->
-    
+
     <xml id="toolbox" style="display: none">
-      <block type="controls_if"></block>
-      <block type="controls_repeat_ext"></block>
-      <block type="logic_compare"></block>
-      <block type="math_number"></block>
-      <block type="math_arithmetic"></block>
-      <block type="text"></block>
-      <block type="text_print"></block>
+      <category name="Control" colour="210">
+        <block type="controls_if"></block>
+        <block type="controls_repeat_ext"></block>
+      </category>
+      <category name="Logic" colour="120">
+        <block type="logic_compare"></block>
+      </category>
+      <category name="Math" colour="20">
+        <block type="math_number"></block>
+        <block type="math_arithmetic"></block>
+      </category>
+      <category name="Text" colour="330">
+        <block type="text"></block>
+        <block type="text_print"></block>
+      </category>
+      <category name="Custom" colour="290">
+        <block type="turtle_move"></block>
+        <block type="turtle_rotate"></block>
+      </category>
     </xml>
     <script>
+      // workspace
       var workspace = Blockly.inject('blocklyDiv',
           {toolbox: document.getElementById('toolbox')});
+
+      // canvas
+      var canvas = document.getElementById('display');
+      var context = canvas.getContext('2d');
+
+
+      // update code
+      Blockly.JavaScript.addReservedWords('code');
+      var code;
+      function myUpdateFunction(event) {
+        code = Blockly.JavaScript.workspaceToCode(workspace);
+      }
+      workspace.addChangeListener(myUpdateFunction);
+
+      // button on click
+      var positionX = 100, positionY = 150, rotation = 0;
+      document.getElementById('runBtn').onclick = function() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        positionX = 100, positionY = 150, rotation = 0;
+        try {
+          eval(code);
+        } catch (e) {
+          alert(e);
+        }
+      }
+
+      function move(distance) {
+        context.beginPath();
+        context.moveTo(positionX, positionY);
+        angle = (rotation % 360) * Math.PI / 180;
+        positionX += distance * Math.cos(angle);
+        positionY += distance * Math.sin(angle)
+        context.lineTo(positionX, positionY);
+        context.stroke();
+      }
+
+      function rotate(newRotation) {
+        rotation += newRotation;
+      }
+
+      // custom buttons
+      Blockly.Blocks['turtle_move'] = {
+        /**
+         * Block for moving forward or backwards.
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendValueInput('VALUE')
+              .setCheck('Number')
+              .appendField('move');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+
+      Blockly.JavaScript['turtle_move'] = function(block) {
+        // Generate JavaScript for moving forward or backwards.
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'move' +
+            '(' + value + ');\n';
+      };
+
+      Blockly.Blocks['turtle_rotate'] = {
+        /**
+         * Block for moving forward or backwards.
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendValueInput('VALUE')
+              .setCheck('Number')
+              .appendField('rotate');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+
+      Blockly.JavaScript['turtle_rotate'] = function(block) {
+        // Generate JavaScript for moving forward or backwards.
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'rotate' +
+            '(' + value + ');\n';
+      };
+
     </script>
   </body>
 </html>
