@@ -1,0 +1,184 @@
+<lively-turtle-canvas id="tCanvas">
+Test
+</lively-turtle-canvas>
+
+<br>
+
+<button type="button" id="StepButton" onclick="step()">Step</button>
+<button type="button" id="StartButton" onclick="startSim()">Start</button>
+<button type="button" id="PauseButton" onclick="pauseSim()" disabled="">Pause</button>
+<button type="button" id="ResetButton" onclick="reset()">Reset</button>
+
+<br>
+
+<input id="clearColor" type="color" value="#FFFFFF">
+
+<br>
+
+<span id="info">(reset)</span>
+
+<lively-window title="Particle Spawning" style="z-index: 100;">
+<juicy-ace-editor id="spawningCode">
+for (var i = 0; i &lt; 100; i++)
+{
+  var part = {
+    turtle: {
+      pos: {
+        x: 300,
+        y: 400
+      },
+      heading: (Math.random() * 120 + 210)
+    },
+    velocity: (Math.random() * 128 + 32)
+  };
+
+  particles.push(part);
+}
+</juicy-ace-editor>
+</lively-window>
+<lively-window title="Particle Movement" style="z-index: 102;" active="true">
+<juicy-ace-editor id="movementCode">
+turtle.penUp();
+turtle.setColor(Math.round(particle.velocity * 20),
+                Math.round(particle.velocity * 5),
+                Math.round(particle.velocity * 0.5));
+turtle.forward(particle.velocity * 0.1);
+turtle.backward(1);
+turtle.penDown();
+turtle.forward(1);
+
+if (Math.random() &lt; 0.5)
+	turtle.left(Math.random()*10);
+else
+	turtle.right(Math.random()*10);
+
+turtle.right(90);
+
+if (turtle.getHeading() &gt; 180)
+	turtle.left(360);
+
+// -180 &lt; turtle.heading &lt;= 180
+turtle.setHeading(turtle.getHeading() * 0.8);
+
+turtle.left(90);
+
+particle.velocity *= 0.9;
+return particle.velocity &gt; 5;
+</juicy-ace-editor>
+</lively-window>
+<script type="text/javascript">
+  var particles = [];
+  var stepNumber = 0;
+  var running = false;
+  var requestedFrame = 0;
+
+  var can = document.getElementById("tCanvas");
+  can.initialize();
+  var turtle = can.turtle;
+  var canvas = can.canvas;
+  var context = can.context;
+
+  function saveSpawnCode()
+  {
+    this.spawnFunction = eval("() => {" + document.getElementById("spawningCode").value + "}")
+  }
+  
+  function saveMovementCode()
+  {
+    this.movementFunction = eval("(particle) => {" + document.getElementById("movementCode").value + "}");
+  }
+
+  function clearThis()
+  {
+    var color = document.getElementById("clearColor").value;
+    can.clearCanvas(color);
+  }
+  
+  function step()
+  {
+    clearThis();
+    stepNumber++;
+    
+    var startTime = new Date();
+    spawn();
+    moveAndDraw();
+    var endTime = new Date();
+    
+    var elapsed = endTime - startTime;
+    var partCount = particles.length;
+    
+    document.getElementById("info").innerHTML = partCount.toString(10) + " Particles, " + elapsed.toString(10) + "ms";
+    
+    if (running)
+      requestedFrame = requestAnimationFrame(step);
+  }
+  
+  function spawn()
+  {
+    spawnFunction();
+  }
+  
+  function moveAndDraw()
+  {
+    newParts = [];
+    for (part of particles)
+    {
+      turtle.setState(part.turtle);
+      var keep = movementFunction(part);
+      part.turtle = turtle.getState();
+      if (keep)
+        newParts.push(part);
+    }
+    particles = newParts;
+  }
+  
+  function startSim()
+  {
+    requestedFrame = requestAnimationFrame(step);
+    
+    document.getElementById("StepButton").disabled = true;
+    document.getElementById("StartButton").disabled = true;
+    document.getElementById("PauseButton").disabled = false;
+    
+    running = true;
+  }
+  
+  function pauseSim()
+  {
+    running = false;
+    cancelAnimationFrame(requestedFrame);
+    
+    document.getElementById("StepButton").disabled = false;
+    document.getElementById("StartButton").disabled = false;
+    document.getElementById("PauseButton").disabled = true;
+  }
+  
+  function reset()
+  {
+    if (running)
+      pauseSim();
+    particles = [];
+    stepNumber = 0;
+    clearThis();
+    document.getElementById("info").innerHTML = "(reset)";
+  }
+  
+  function init()
+  {
+    saveMovementCode();
+    saveSpawnCode();
+    
+    var spawner = document.getElementById("spawningCode");
+    var mover = document.getElementById("movementCode");
+    
+    spawner.changeMode("javascript");
+    spawner.customizeEditor();
+    spawner.doSave = () => {saveSpawnCode()};
+    
+    mover.changeMode("javascript");
+    mover.customizeEditor();
+    mover.doSave = () => {saveMovementCode()};
+  };
+  
+  init();
+</script>

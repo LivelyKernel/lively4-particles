@@ -12,17 +12,16 @@
     <button id="runBtn" class="primary" title="Run animation">
       Run animation
     </button>
-    <!-- <button id="resetBtn" class="primary" title="Reset animation">
-      Reset animation
-    </button> -->
+    <!--<lively-turtle-canvas id="tCanvas">-->
+    <!--Test-->
+    <!--</lively-turtle-canvas>-->
     <div id="blocklyDiv">
     </div>
+
     <div id="visualization" style="left: 400px">
       <canvas id="display" width="400" height="400"></canvas>
     </div>
-    <!-- this does not work yet...
-    <lively-turtle-canvas></lively-turtle-canvas>
-    -->
+
 
     <xml id="toolbox" style="display: none">
       <category name="Control" colour="210">
@@ -43,9 +42,10 @@
       <category name="Custom" colour="290">
         <block type="turtle_move"></block>
         <block type="turtle_rotate"></block>
+        <block type="turtle_penup"></block>
       </category>
     </xml>
-    <script>
+    <script type="text/javascript">
       // workspace
       var workspace = Blockly.inject('blocklyDiv',
           {toolbox: document.getElementById('toolbox')});
@@ -53,7 +53,11 @@
       // canvas
       var canvas = document.getElementById('display');
       var context = canvas.getContext('2d');
-
+      // var can = document.getElementById("tCanvas");
+      // can.initialize();
+      // var turtle = can.turtle;
+      // var canvas = can.canvas;
+      // var context = can.context;
 
       // update code
       Blockly.JavaScript.addReservedWords('code');
@@ -88,8 +92,35 @@
       function rotate(newRotation) {
         rotation += newRotation;
       }
+      
+      function blockToCode(functionName, block) {
+        // Generate JavaScript.
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return functionName +
+            '(' + value + ');\n';  
+      }
 
       // custom buttons
+      Blockly.Blocks['turtle_penup'] = {
+        /**
+         * Block for pen up
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendDummyInput()
+              .appendField('penUp');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+      Blockly.JavaScript['turtle_penup'] = function(block) {
+        // Generate JavaScript for setting pen up.
+        return 'turtle.penUp();\n';
+      };      
+      
       Blockly.Blocks['turtle_move'] = {
         /**
          * Block for moving forward or backwards.
@@ -108,10 +139,8 @@
 
       Blockly.JavaScript['turtle_move'] = function(block) {
         // Generate JavaScript for moving forward or backwards.
-        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-            Blockly.JavaScript.ORDER_NONE) || '0';
-        return 'move' +
-            '(' + value + ');\n';
+        return blockToCode('move', block);
+        //return blockToCode('turtle.forward', block);
       };
 
       Blockly.Blocks['turtle_rotate'] = {
@@ -131,11 +160,8 @@
 
 
       Blockly.JavaScript['turtle_rotate'] = function(block) {
-        // Generate JavaScript for moving forward or backwards.
-        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-            Blockly.JavaScript.ORDER_NONE) || '0';
-        return 'rotate' +
-            '(' + value + ');\n';
+        // Generate JavaScript for rotating.
+        return blockToCode('rotate', block);
       };
 
     </script>
