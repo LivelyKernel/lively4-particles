@@ -14,6 +14,7 @@
     Test
     </lively-turtle-canvas>
     <!-- controls compatible wth ace editor -->
+    <br>
     <button type="button" id="StepButton" onclick="step()">Step</button>
     <button type="button" id="StartButton" onclick="startSim()">Start</button>
     <button type="button" id="PauseButton" onclick="pauseSim()" disabled="">Pause</button>
@@ -24,23 +25,24 @@
     <span id="info">(reset)</span>
 
     <lively-window title="Particle Spawning" style="z-index: 100;">
-    <juicy-ace-editor id="spawningCode">
-    for (var i = 0; i &lt; 100; i++)
-    {
-      var part = {
-        turtle: {
-          pos: {
-            x: 300,
-            y: 400
+      <juicy-ace-editor id="spawningCode">
+      for (var i = 0; i &lt; 100; i++)
+      {
+        var part = {
+          turtle: {
+            pos: {
+              x: 300,
+              y: 400
+            },
+            heading: (Math.random() * 120 + 210)
           },
-          heading: (Math.random() * 120 + 210)
-        },
-        velocity: (Math.random() * 128 + 32)
-      };
-
-      particles.push(part);
-    }
-    </juicy-ace-editor>
+          velocity: (Math.random() * 128 + 32)
+        };
+  
+        particles.push(part);
+      }
+      </juicy-ace-editor>
+    </lively-window>
 
     <div id="blocklyDiv">
     </div>
@@ -63,15 +65,20 @@
         <block type="text_print"></block>
       </category>
       <category name="Custom" colour="290">
+        <block type="turtle_penup"></block>
+        <block type="turtle_pendown"></block>
+        <block type="turtle_setcolor"></block>
         <block type="turtle_forward"></block>
         <block type="turtle_backward"></block>
         <block type="turtle_right"></block>
         <block type="turtle_left"></block>
-        <block type="turtle_penup"></block>
-        <block type="turtle_pendown"></block>
       </category>
     </xml>
     <script type="text/javascript">
+      // workspace
+      var workspace = Blockly.inject('blocklyDiv',
+          {toolbox: document.getElementById('toolbox')});
+
       // particles
       var particles = [];
       var stepNumber = 0;
@@ -84,10 +91,6 @@
       var canvas = can.canvas;
       var context = can.context;
 
-      // workspace
-      var workspace = Blockly.inject('blocklyDiv',
-          {toolbox: document.getElementById('toolbox')});
-
       // update code
       Blockly.JavaScript.addReservedWords('code');
       var code = Blockly.JavaScript.workspaceToCode(workspace);
@@ -95,6 +98,7 @@
 
       function myUpdateFunction(event) {
         code = Blockly.JavaScript.workspaceToCode(workspace);
+        saveMovementCode();
       }
       workspace.addChangeListener(myUpdateFunction);
 
@@ -138,6 +142,38 @@
         return 'turtle.penDown();\n';
       };
 
+      // turtle_setcolor
+      Blockly.Blocks['turtle_setcolor'] = {
+        /**
+         * Block for moving forward
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendValueInput('VALUE')
+              .setCheck('Number') // validate
+              .appendField('setColor');
+          this.appendValueInput('VALUE1')
+              .setCheck('Number'); // validate
+          this.appendValueInput('VALUE2')
+              .setCheck('Number'); // validate
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+
+      Blockly.JavaScript['turtle_setcolor'] = function(block) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        var value1 = Blockly.JavaScript.valueToCode(block, 'VALUE1',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        var value2 = Blockly.JavaScript.valueToCode(block, 'VALUE2',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'turtle.setColor' +
+            '(' + value + ', ' + value1 + ', ' + value2 + ');\n';
+      };
+
       // math_random
       Blockly.Blocks['math_random'] = {
         /**
@@ -145,7 +181,6 @@
          * @this Blockly.Block
          */
         init: function() {
-          this.setColour(330);
           this.setOutput(true, 'Math.random');
         }
       };
@@ -258,7 +293,7 @@
 
       function saveMovementCode()
       {
-        this.movementFunction = eval("(particle) => {" + code + "particle.velocity *= 0.9;\nreturn particle.velocity &gt; 5;" + "}");
+        this.movementFunction = eval("(particle) => {" + code + "particle.velocity *= 0.9;\nreturn particle.velocity > 5;\n" + "}");
       }
 
       function clearThis()
@@ -298,6 +333,7 @@
         {
           turtle.setState(part.turtle);
           var keep = movementFunction(part);
+          console.log(movementFunction);
           part.turtle = turtle.getState();
           if (keep)
             newParts.push(part);
@@ -342,15 +378,15 @@
         saveSpawnCode();
 
         var spawner = document.getElementById("spawningCode");
-        var mover = document.getElementById("movementCode");
+        // var mover = document.getElementById("movementCode");
 
         spawner.changeMode("javascript");
         spawner.customizeEditor();
         spawner.doSave = () => {saveSpawnCode()};
 
-        mover.changeMode("javascript");
-        mover.customizeEditor();
-        mover.doSave = () => {saveMovementCode()};
+        // mover.changeMode("javascript");
+        // mover.customizeEditor();
+        // mover.doSave = () => {saveMovementCode()};
       };
 
       init();
