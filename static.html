@@ -7,21 +7,43 @@
     <script src="./google-blockly/blockly_compressed.js"></script>
     <script src="./google-blockly/javascript_compressed.js"></script>
     <script src="./google-blockly/msg/js/en.js"></script>
+    <!-- <script src="./NeilFraser-JS-Interpreter/acorn_interpreter.js"></script> -->
   </head>
   <body>
-    <button id="runBtn" class="primary" title="Run animation">
-      Run animation
-    </button>
-    <!--<lively-turtle-canvas id="tCanvas">-->
-    <!--Test-->
-    <!--</lively-turtle-canvas>-->
+    <lively-turtle-canvas id="tCanvas">
+    Test
+    </lively-turtle-canvas>
+    <!-- controls compatible wth ace editor -->
+    <button type="button" id="StepButton" onclick="step()">Step</button>
+    <button type="button" id="StartButton" onclick="startSim()">Start</button>
+    <button type="button" id="PauseButton" onclick="pauseSim()" disabled="">Pause</button>
+    <button type="button" id="ResetButton" onclick="reset()">Reset</button>
+    <br>
+    <input id="clearColor" type="color" value="#FFFFFF">
+    <br>
+    <span id="info">(reset)</span>
+
+    <lively-window title="Particle Spawning" style="z-index: 100;">
+    <juicy-ace-editor id="spawningCode">
+    for (var i = 0; i &lt; 100; i++)
+    {
+      var part = {
+        turtle: {
+          pos: {
+            x: 300,
+            y: 400
+          },
+          heading: (Math.random() * 120 + 210)
+        },
+        velocity: (Math.random() * 128 + 32)
+      };
+
+      particles.push(part);
+    }
+    </juicy-ace-editor>
+
     <div id="blocklyDiv">
     </div>
-
-    <div id="visualization" style="left: 400px">
-      <canvas id="display" width="400" height="400"></canvas>
-    </div>
-
 
     <xml id="toolbox" style="display: none">
       <category name="Control" colour="210">
@@ -34,74 +56,49 @@
       <category name="Math" colour="20">
         <block type="math_number"></block>
         <block type="math_arithmetic"></block>
+        <block type="math_random"></block>
       </category>
       <category name="Text" colour="330">
         <block type="text"></block>
         <block type="text_print"></block>
       </category>
       <category name="Custom" colour="290">
-        <block type="turtle_move"></block>
-        <block type="turtle_rotate"></block>
+        <block type="turtle_forward"></block>
+        <block type="turtle_backward"></block>
+        <block type="turtle_right"></block>
+        <block type="turtle_left"></block>
         <block type="turtle_penup"></block>
+        <block type="turtle_pendown"></block>
       </category>
     </xml>
     <script type="text/javascript">
+      // particles
+      var particles = [];
+      var stepNumber = 0;
+      var running = false;
+      var requestedFrame = 0;
+
+      var can = document.getElementById("tCanvas");
+      can.initialize();
+      var turtle = can.turtle;
+      var canvas = can.canvas;
+      var context = can.context;
+
       // workspace
       var workspace = Blockly.inject('blocklyDiv',
           {toolbox: document.getElementById('toolbox')});
 
-      // canvas
-      var canvas = document.getElementById('display');
-      var context = canvas.getContext('2d');
-      // var can = document.getElementById("tCanvas");
-      // can.initialize();
-      // var turtle = can.turtle;
-      // var canvas = can.canvas;
-      // var context = can.context;
-
       // update code
       Blockly.JavaScript.addReservedWords('code');
-      var code;
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      // var myInterpreter = new Interpreter(code); <-- try later
+
       function myUpdateFunction(event) {
         code = Blockly.JavaScript.workspaceToCode(workspace);
       }
       workspace.addChangeListener(myUpdateFunction);
 
-      // button on click
-      var positionX = 100, positionY = 150, rotation = 0;
-      document.getElementById('runBtn').onclick = function() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        positionX = 100, positionY = 150, rotation = 0;
-        try {
-          eval(code);
-        } catch (e) {
-          alert(e);
-        }
-      }
-
-      function move(distance) {
-        context.beginPath();
-        context.moveTo(positionX, positionY);
-        angle = (rotation % 360) * Math.PI / 180;
-        positionX += distance * Math.cos(angle);
-        positionY += distance * Math.sin(angle)
-        context.lineTo(positionX, positionY);
-        context.stroke();
-      }
-
-      function rotate(newRotation) {
-        rotation += newRotation;
-      }
-      
-      function blockToCode(functionName, block) {
-        // Generate JavaScript.
-        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-            Blockly.JavaScript.ORDER_NONE) || '0';
-        return functionName +
-            '(' + value + ');\n';  
-      }
-
-      // custom buttons
+      // custom buttons, turtle_penup
       Blockly.Blocks['turtle_penup'] = {
         /**
          * Block for pen up
@@ -119,50 +116,244 @@
       Blockly.JavaScript['turtle_penup'] = function(block) {
         // Generate JavaScript for setting pen up.
         return 'turtle.penUp();\n';
-      };      
-      
-      Blockly.Blocks['turtle_move'] = {
+      };
+
+      // custom buttons, turtle_pendown
+      Blockly.Blocks['turtle_pendown'] = {
         /**
-         * Block for moving forward or backwards.
+         * Block for pen up
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendDummyInput()
+              .appendField('penDown');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+      Blockly.JavaScript['turtle_pendown'] = function(block) {
+        // Generate JavaScript for setting pen up.
+        return 'turtle.penDown();\n';
+      };
+
+      // math_random
+      Blockly.Blocks['math_random'] = {
+        /**
+         * Block for math random
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.setOutput(true, 'Math.random');
+        }
+      };
+
+      Blockly.JavaScript['math_random'] = function(block) {
+        // Generate JavaScript for setting math random.
+        return 'Math.random()';
+      };
+
+      // turtle_forward
+      Blockly.Blocks['turtle_forward'] = {
+        /**
+         * Block for moving forward
          * @this Blockly.Block
          */
         init: function() {
           this.setColour(330);
           this.appendValueInput('VALUE')
-              .setCheck('Number')
-              .appendField('move');
+              .setCheck('Number') // validate
+              .appendField('turtle forward');
           this.setPreviousStatement(true);
           this.setNextStatement(true);
         }
       };
 
 
-      Blockly.JavaScript['turtle_move'] = function(block) {
-        // Generate JavaScript for moving forward or backwards.
-        return blockToCode('move', block);
-        //return blockToCode('turtle.forward', block);
+      Blockly.JavaScript['turtle_forward'] = function(block) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'turtle.forward' +
+            '(' + value + ');\n';
       };
 
-      Blockly.Blocks['turtle_rotate'] = {
+      // turtle_backward
+      Blockly.Blocks['turtle_backward'] = {
         /**
-         * Block for moving forward or backwards.
+         * Block for moving forward
          * @this Blockly.Block
          */
         init: function() {
           this.setColour(330);
           this.appendValueInput('VALUE')
-              .setCheck('Number')
-              .appendField('rotate');
+              .setCheck('Number') // validate
+              .appendField('turtle backward');
           this.setPreviousStatement(true);
           this.setNextStatement(true);
         }
       };
 
 
-      Blockly.JavaScript['turtle_rotate'] = function(block) {
-        // Generate JavaScript for rotating.
-        return blockToCode('rotate', block);
+      Blockly.JavaScript['turtle_backward'] = function(block) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'turtle.backward' +
+            '(' + value + ');\n';
       };
+
+      // turtle_left
+      Blockly.Blocks['turtle_left'] = {
+        /**
+         * Block for moving forward
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendValueInput('VALUE')
+              .setCheck('Number') // validate
+              .appendField('turtle left');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+
+      Blockly.JavaScript['turtle_left'] = function(block) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'turtle.left' +
+            '(' + value + ');\n';
+      };
+
+      // turtle_right
+      Blockly.Blocks['turtle_right'] = {
+        /**
+         * Block for moving forward
+         * @this Blockly.Block
+         */
+        init: function() {
+          this.setColour(330);
+          this.appendValueInput('VALUE')
+              .setCheck('Number') // validate
+              .appendField('turtle right');
+          this.setPreviousStatement(true);
+          this.setNextStatement(true);
+        }
+      };
+
+
+      Blockly.JavaScript['turtle_right'] = function(block) {
+        var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+            Blockly.JavaScript.ORDER_NONE) || '0';
+        return 'turtle.right' +
+            '(' + value + ');\n';
+      };
+
+      function saveSpawnCode()
+      {
+        this.spawnFunction = eval("() => {" + document.getElementById("spawningCode").value + "}")
+      }
+
+      function saveMovementCode()
+      {
+        this.movementFunction = eval("(particle) => {" + code + "particle.velocity *= 0.9;\nreturn particle.velocity &gt; 5;" + "}");
+      }
+
+      function clearThis()
+      {
+        var color = document.getElementById("clearColor").value;
+        can.clearCanvas(color);
+      }
+
+      function step()
+      {
+        clearThis();
+        stepNumber++;
+
+        var startTime = new Date();
+        spawn();
+        moveAndDraw();
+        var endTime = new Date();
+
+        var elapsed = endTime - startTime;
+        var partCount = particles.length;
+
+        document.getElementById("info").innerHTML = partCount.toString(10) + " Particles, " + elapsed.toString(10) + "ms";
+
+        if (running)
+          requestedFrame = requestAnimationFrame(step);
+      }
+
+      function spawn()
+      {
+        spawnFunction();
+      }
+
+      function moveAndDraw()
+      {
+        newParts = [];
+        for (part of particles)
+        {
+          turtle.setState(part.turtle);
+          var keep = movementFunction(part);
+          part.turtle = turtle.getState();
+          if (keep)
+            newParts.push(part);
+        }
+        particles = newParts;
+      }
+
+      function startSim()
+      {
+        requestedFrame = requestAnimationFrame(step);
+
+        document.getElementById("StepButton").disabled = true;
+        document.getElementById("StartButton").disabled = true;
+        document.getElementById("PauseButton").disabled = false;
+
+        running = true;
+      }
+
+      function pauseSim()
+      {
+        running = false;
+        cancelAnimationFrame(requestedFrame);
+
+        document.getElementById("StepButton").disabled = false;
+        document.getElementById("StartButton").disabled = false;
+        document.getElementById("PauseButton").disabled = true;
+      }
+
+      function reset()
+      {
+        if (running)
+          pauseSim();
+        particles = [];
+        stepNumber = 0;
+        clearThis();
+        document.getElementById("info").innerHTML = "(reset)";
+      }
+
+      function init()
+      {
+        saveMovementCode();
+        saveSpawnCode();
+
+        var spawner = document.getElementById("spawningCode");
+        var mover = document.getElementById("movementCode");
+
+        spawner.changeMode("javascript");
+        spawner.customizeEditor();
+        spawner.doSave = () => {saveSpawnCode()};
+
+        mover.changeMode("javascript");
+        mover.customizeEditor();
+        mover.doSave = () => {saveMovementCode()};
+      };
+
+      init();
 
     </script>
   </body>
