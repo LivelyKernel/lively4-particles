@@ -107,7 +107,7 @@
         init: function() {
           this.setColour(330);
           this.appendDummyInput()
-              .appendField('pen:');
+              .appendField('pen:')
               .appendField(new Blockly.FieldDropdown([
                              ['up', 'Up'],
                              ['down', 'Down']
@@ -190,8 +190,8 @@
                              ['left', 'left'],
                              ['right', 'right']
                            ]),
-                           'DIRECTION')
-              .appendValueInput('VALUE')
+                           'DIRECTION');
+          this.appendValueInput('VALUE');
           this.setPreviousStatement(true);
           this.setNextStatement(true);
         }
