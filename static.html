@@ -27,8 +27,7 @@
     <div id="spawnCodeDiv" style="height: 200px; width: 400px;">
     </div>
 
-    <div id="movementCodeDiv" style="height: 400px; width: 600px;">
-    </div>
+    <div id="movementCodeDiv" style="height: 400px; width: 600px;"></div>
 
     <xml id="toolbox" style="display: none">
       <category name="Control" colour="210">
@@ -57,7 +56,7 @@
     <xml id="toolboxSpawn" style="display: none">
       <block type="math_number"></block>
       <block type="math_arithmetic"></block>
-      <block type="math_random"></block>
+      <block type="math_random_float"></block>
     </xml>
 
     <xml id="turtle" style="display: none">
@@ -78,8 +77,7 @@
           </block>
         </value>
         <value name="VELOCITY">
-          <block type="math_number">
-            <field name="NUM">0</field>
+          <block type="math_random_float">
           </block>
         </value>
       </block>
@@ -89,9 +87,11 @@
       // workspace
       var workspace = Blockly.inject('movementCodeDiv',
           {toolbox: document.getElementById('toolbox')});
+      workspace.addChangeListener((evt) => {saveMovementCode();});
 
       var workspaceSpawn = Blockly.inject('spawnCodeDiv',
           {toolbox: document.getElementById('toolboxSpawn')});
+      workspaceSpawn.addChangeListener((evt) => {saveSpawnCode();});
 
       Blockly.Xml.domToWorkspace(document.getElementById('turtle'), workspaceSpawn);
 
@@ -101,7 +101,7 @@
       var running = false;
       var requestedFrame = 0;
 
-      var spawnCode = "";
+      var spawnCode = () => {};
       var movementCode = (particle) => {};
 
       var can = document.getElementById("tCanvas");
@@ -112,12 +112,14 @@
 
       function saveSpawnCode()
       {
-        this.spawnCode = eval(Blockly.JavaScript.workspaceToCode(workspace));
+        var code = eval(Blockly.JavaScript.workspaceToCode(workspaceSpawn));
+        this.spawnCode = code;
       }
 
       function saveMovementCode()
       {
-        this.movementFunction = eval("(particle) => {" + Blockly.JavaScript.workspaceToCode(workspace) + "}");
+        var code = "(particle) => {" + Blockly.JavaScript.workspaceToCode(workspace) + "}";
+        this.movementFunction = eval(code);
       }
 
       function clearThis()
@@ -128,14 +130,14 @@
 
       function step()
       {
-        clearThis();
+        //clearThis();
         stepNumber++;
 
         var startTime = new Date();
         spawn();
         moveAndDraw();
         var endTime = new Date();
-
+        
         var elapsed = endTime - startTime;
         var partCount = particles.length;
 
@@ -151,7 +153,9 @@
 
         while (particles.length < targetCount)
         {
+          console.log(spawnCode);
           var newParticle = spawnCode();
+          console.log(newParticle);
           particles.push(newParticle);
         }
 
@@ -167,13 +171,14 @@
         {
           turtle.setState(part);
           movementFunction(part);
-          part = part.assign(turtle.getState());
+          part = Object.assign(part, turtle.getState());
         }
       }
 
       function startSim()
       {
         saveMovementCode();
+        saveSpawnCode();
         requestedFrame = requestAnimationFrame(step);
 
         document.getElementById("StepButton").disabled = true;
@@ -207,17 +212,6 @@
       {
         saveMovementCode();
         saveSpawnCode();
-
-        var spawner = document.getElementById("spawningCode");
-        // var mover = document.getElementById("movementCode");
-
-        spawner.changeMode("javascript");
-        spawner.customizeEditor();
-        spawner.doSave = () => {saveSpawnCode()};
-
-        // mover.changeMode("javascript");
-        // mover.customizeEditor();
-        // mover.doSave = () => {saveMovementCode()};
       };
 
       init();

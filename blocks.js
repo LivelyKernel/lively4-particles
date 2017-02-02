@@ -1,3 +1,7 @@
+function getValueFromBlock(block, variable) {
+  return Blockly.JavaScript.valueToCode(block, variable, Blockly.JavaScript.ORDER_NONE) || '0';
+}
+
 Blockly.Blocks['turtle_pen'] = {
   /**
    * Block for pen up
@@ -53,23 +57,6 @@ Blockly.JavaScript['turtle_setcolor'] = function(block) {
       '(' + value + ', ' + value1 + ', ' + value2 + ');\n';
 };
 
-Blockly.Blocks['math_random'] = {
-  /**
-   * Block for math random
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.appendDummyInput()
-        .appendField('Math.random()');
-    this.setOutput(true, 'Number');
-  }
-};
-
-Blockly.JavaScript['math_random'] = function(block) {
-  // Generate JavaScript for setting math random.
-  return 'Math.random()';
-};
-
 Blockly.Blocks['turtle_move'] = {
   /**
    * Block for moving
@@ -87,7 +74,7 @@ Blockly.Blocks['turtle_move'] = {
                        ['right', 'right']
                      ]),
                      'DIRECTION');
-    this.appendValueInput('VALUE');
+    this.appendValueInput('VALUE')
     this.setPreviousStatement(true);
     this.setNextStatement(true);
   }
@@ -95,7 +82,8 @@ Blockly.Blocks['turtle_move'] = {
 
 Blockly.JavaScript['turtle_move'] = function(block) {
   var direction = block.getFieldValue('DIRECTION');
-  var value = block.getFieldValue('VALUE');
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
 
   return 'turtle.'+ direction +
       '(' + value + ');\n';
@@ -128,10 +116,10 @@ Blockly.Blocks['turtle_define'] = {
 };
 
 Blockly.JavaScript['turtle_define'] = function(block) {
-  var x = block.getFieldValue('X') || 0;
-  var y = block.getFieldValue('Y') || 0;
-  var heading = block.getFieldValue('HEADING') || 0;
-  var velocity = block.getFieldValue('VELOCITY') || 0;
+  var x = getValueFromBlock(block, 'X');
+  var y = getValueFromBlock(block, 'Y');
+  var heading = getValueFromBlock(block, 'HEADING');
+  var velocity = getValueFromBlock(block, 'VELOCITY');
 
-  return 'function() { return {pos: {x: '+ x +', y: ' + y + '}, heading: ' + heading + ', velocity: ' + velocity + '}; }';
+  return '() => { return {pos: {x: '+ x +', y: ' + y + '}, heading: ' + heading + ', velocity: ' + velocity + '}; }';
 };
