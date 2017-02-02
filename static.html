@@ -24,19 +24,6 @@
     <br>
     <span id="info">0 Particles, 0ms</span>
 
-     <lively-window title="Particle Spawning">
-      <juicy-ace-editor id="spawningCode">
-{
-  pos: {
-    x: (Math.random()) * 300 + 150,
-    y: (Math.random()) * 400 + 100
-  },
-  heading: (Math.random() * 360),
-  velocity: (Math.random() * 16 + 16)
-}
-      </juicy-ace-editor>
-    </lively-window>
-
     <div id="spawnCodeDiv" style="height: 200px; width: 400px;">
     </div>
 
@@ -85,6 +72,16 @@
             <field name="NUM">0</field>
           </block>
         </value>
+        <value name="HEADING">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
+        <value name="VELOCITY">
+          <block type="math_number">
+            <field name="NUM">0</field>
+          </block>
+        </value>
       </block>
     </xml>
 
@@ -115,7 +112,7 @@
 
       function saveSpawnCode()
       {
-        this.spawnCode = "(function () { return " + document.getElementById("spawningCode").value + ";})()";
+        this.spawnCode = eval(Blockly.JavaScript.workspaceToCode(workspace));
       }
 
       function saveMovementCode()
@@ -154,7 +151,7 @@
 
         while (particles.length < targetCount)
         {
-          var newParticle = eval(spawnCode);
+          var newParticle = spawnCode();
           particles.push(newParticle);
         }
 

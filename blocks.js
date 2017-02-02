@@ -118,12 +118,20 @@ Blockly.Blocks['turtle_define'] = {
         .setCheck('Number')
         .appendField('y:')
         .setAlign(Blockly.ALIGN_RIGHT);
+    this.appendValueInput('HEADING')
+        .setCheck('Number')
+        .appendField('heading:');
+    this.appendValueInput('VELOCITY')
+        .setCheck('Number')
+        .appendField('velocity:');
   }
 };
 
 Blockly.JavaScript['turtle_define'] = function(block) {
-  var x = block.getFieldValue('X');
-  var y = block.getFieldValue('Y');
+  var x = block.getFieldValue('X') || 0;
+  var y = block.getFieldValue('Y') || 0;
+  var heading = block.getFieldValue('HEADING') || 0;
+  var velocity = block.getFieldValue('VELOCITY') || 0;
 
-  return '(function() { return {pos: {x: '+ x +', y: ' + y + '}}; })()';
+  return 'function() { return {pos: {x: '+ x +', y: ' + y + '}, heading: ' + heading + ', velocity: ' + velocity + '}; }';
 };
