@@ -34,12 +34,12 @@ Blockly.Blocks['turtle_setcolor'] = {
    */
   init: function() {
     this.setColour(330);
-    this.appendValueInput('VALUE')
+    this.appendValueInput('X')
         .setCheck('Number') // validate
         .appendField('setColor');
-    this.appendValueInput('VALUE1')
+    this.appendValueInput('Y')
         .setCheck('Number'); // validate
-    this.appendValueInput('VALUE2')
+    this.appendValueInput('Z')
         .setCheck('Number'); // validate
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -47,11 +47,11 @@ Blockly.Blocks['turtle_setcolor'] = {
 };
 
 Blockly.JavaScript['turtle_setcolor'] = function(block) {
-  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+  var value = Blockly.JavaScript.valueToCode(block, 'X',
       Blockly.JavaScript.ORDER_NONE) || '0';
-  var value1 = Blockly.JavaScript.valueToCode(block, 'VALUE1',
+  var value1 = Blockly.JavaScript.valueToCode(block, 'Y',
       Blockly.JavaScript.ORDER_NONE) || '0';
-  var value2 = Blockly.JavaScript.valueToCode(block, 'VALUE2',
+  var value2 = Blockly.JavaScript.valueToCode(block, 'Z',
       Blockly.JavaScript.ORDER_NONE) || '0';
   return 'turtle.setColor' +
       '(' + value + ', ' + value1 + ', ' + value2 + ');\n';
@@ -89,6 +89,48 @@ Blockly.JavaScript['turtle_move'] = function(block) {
       '(' + value + ');\n';
 };
 
+
+Blockly.Blocks['turtle_setheading'] = {
+  /**
+   * Block for heading
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(330);
+    this.appendDummyInput()
+        .appendField('setHeading');
+    this.appendValueInput('VALUE')
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['turtle_setheading'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+
+  return 'turtle.setHeading' +
+      '(' + value + ');\n';
+};
+
+Blockly.Blocks['turtle_getheading'] = {
+  /**
+   * Block for getting heading
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(330);
+    this.appendDummyInput()
+        .appendField('getHeading');
+    this.setOutput(true, 'Number');
+  }
+};
+
+Blockly.JavaScript['turtle_getheading'] = function(block) {
+  return ['turtle.getHeading()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+
 Blockly.Blocks['turtle_define'] = {
   /**
    * Block for definition
@@ -109,9 +151,6 @@ Blockly.Blocks['turtle_define'] = {
     this.appendValueInput('HEADING')
         .setCheck('Number')
         .appendField('heading:');
-    this.appendValueInput('VELOCITY')
-        .setCheck('Number')
-        .appendField('velocity:');
   }
 };
 
@@ -121,5 +160,5 @@ Blockly.JavaScript['turtle_define'] = function(block) {
   var heading = getValueFromBlock(block, 'HEADING');
   var velocity = getValueFromBlock(block, 'VELOCITY');
 
-  return '() => { return {pos: {x: '+ x +', y: ' + y + '}, heading: ' + heading + ', velocity: ' + velocity + '}; }';
+  return '() => { return {pos: {x: '+ x +', y: ' + y + '}, heading: ' + heading + '}; }';
 };

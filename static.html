@@ -25,10 +25,10 @@
     <br>
     <span id="info">0 Particles, 0ms</span>
 
-    <div id="spawnCodeDiv" style="height: 200px; width: 600px;">
+    <div id="spawnCodeDiv" style="height: 200px; width: 850px;">
     </div>
 
-    <div id="movementCodeDiv" style="height: 400px; width: 600px;"></div>
+    <div id="movementCodeDiv" style="height: 400px; width: 850px;"></div>
 
     <xml id="toolbox" style="display: none">
       <category name="Control" colour="210">
@@ -52,6 +52,8 @@
         <block type="turtle_pen"></block>
         <block type="turtle_setcolor"></block>
         <block type="turtle_move"></block>
+        <block type="turtle_setheading"></block>
+        <block type="turtle_getheading"></block>
       </category>
     </xml>
 
@@ -65,56 +67,33 @@
     <xml id="turtleSpawn" style="display: none">
       <block type="turtle_define" deletable="false" movable="false">
         <value name="X">
-          <block type="math_arithmetic">
-            <value name="A">
-              <block type="math_number">
-                <field name="NUM">150</field>
-              </block>
-            </value>
-            <value name="B">
-              <block type="math_random_float">
-              </block>
-            </value>
-            <field name="OP">MULTIPLY</field>
+          <block type="math_number">
+            <field name="NUM">300</field>
           </block>
         </value>
         <value name="Y">
-          <block type="math_arithmetic">
-            <value name="A">
-              <block type="math_number">
-                <field name="NUM">200</field>
-              </block>
-            </value>
-            <value name="B">
-              <block type="math_random_float">
-              </block>
-            </value>
-            <field name="OP">MULTIPLY</field>
+          <block type="math_number">
+            <field name="NUM">400</field>
           </block>
         </value>
         <value name="HEADING">
           <block type="math_arithmetic">
             <value name="A">
               <block type="math_number">
-                <field name="NUM">360</field>
+                <field name="NUM">210</field>
               </block>
             </value>
             <value name="B">
-              <block type="math_random_float">
-              </block>
-            </value>
-            <field name="OP">MULTIPLY</field>
-          </block>
-        </value>
-        <value name="VELOCITY">
-          <block type="math_arithmetic">
-            <value name="A">
-              <block type="math_number">
-                <field name="NUM">23</field>
-              </block>
-            </value>
-            <value name="B">
-              <block type="math_random_float">
+              <block type="math_arithmetic">
+                <value name="A">
+                  <block type="math_random_float">
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">120</field>
+                  </block>
+                </value>
               </block>
             </value>
             <field name="OP">MULTIPLY</field>
@@ -131,9 +110,101 @@
             <field name="DIRECTION">forward</field>
             <value name="VALUE">
               <block type="math_number">
-                <field name="NUM">100</field>
+                <field name="NUM">10</field>
               </block>
             </value>
+            <next>
+              <block type="turtle_setcolor">
+                <value name="X">
+                  <block type="math_random_int">
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">200</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">255</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="Y">
+                  <block type="math_random_int">
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">1</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">155</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="Z">
+                  <block type="math_random_int">
+                    <value name="FROM">
+                      <block type="math_number">
+                        <field name="NUM">1</field>
+                      </block>
+                    </value>
+                    <value name="TO">
+                      <block type="math_number">
+                        <field name="NUM">155</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="turtle_setheading">
+                    <value name="VALUE">
+                      <block type="math_arithmetic">
+                        <value name="A">
+                          <block type="math_number">
+                            <field name="NUM">10</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="turtle_getheading">
+                          </block>
+                        </value>
+                        <field name="OP">ADD</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="controls_if">
+                        <value name="IF0">
+                          <block type="logic_compare">
+                            <value name="A">
+                              <block type="math_random_float">
+                              </block>
+                            </value>
+                            <field name="OP">LT</field>
+                            <value name="B">
+                              <block type="math_number">
+                                <field name="NUM">0.5</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                        <statement name="DO0">
+                          <block type="turtle_move">
+                            <field name="DIRECTION">left</field>
+                            <value name="VALUE">
+                              <block type="math_number">
+                                <field name="NUM">10</field>
+                              </block>
+                            </value>
+                          </block>
+                        </statement>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
           </block>
         </next>
       </block>
@@ -164,6 +235,7 @@
       var can = document.getElementById("tCanvas");
       can.initialize();
       var turtle = can.turtle;
+      window.turtle = turtle;
       var canvas = can.canvas;
       var context = can.context;
 
@@ -191,7 +263,7 @@
         stepNumber++;
 
         var startTime = new Date();
-        // spawn();
+        spawn();
         moveAndDraw();
         var endTime = new Date();
         
@@ -235,7 +307,7 @@
         saveMovementCode();
         saveSpawnCode();
         
-        spawn();
+        //spawn();
         requestedFrame = requestAnimationFrame(step);
 
         document.getElementById("StepButton").disabled = true;
